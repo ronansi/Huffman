@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Main {
 	public static void main(String[] args) throws UnsupportedEncodingException{
-		String teste = "'q";
+		String teste = Util.lerArquivo("texto.txt");
 		
 		Node raiz = Huffman.montarArvore(teste);
 		
