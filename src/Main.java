@@ -1,37 +1,71 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
 
-
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 public class Main {
+	private JFrame janela;
+	private JPanel painelPrincipal;
+	private File arquivo;
+	private JTextField caminhoArquivo;
+	
+	
 	public static void main(String[] args) throws UnsupportedEncodingException{
-		String teste = Util.lerArquivo("texto.txt");
+		new Main().montaTela();
+	}
+	
+	private void escolherArquivo(){
+		JFileChooser chooser = new JFileChooser();
+		int retorno = chooser.showOpenDialog(null);
 		
-		Node raiz = Huffman.montarArvore(teste);
-		
-		System.out.println("\n\n¡rvore Huffman");
-		Node.buildHuffmanCode(raiz);
-		Huffman.imprimirArvore(raiz);
-		
-		System.out.println("\n\nChar\tFreq\tCode");
-		Huffman.imprimirTabela(raiz);
-		
-		Map<String, String> mapa = Huffman.getMapHuffmanCodes(raiz);
-		
-		String original = "";
-		StringBuilder saida = new StringBuilder();
-
-		for(byte b: teste.getBytes("UTF-8")){
-			original += Integer.toBinaryString(b);
+		if(retorno == JFileChooser.APPROVE_OPTION){
+			arquivo = chooser.getSelectedFile();
+			caminhoArquivo.setText(arquivo.getAbsolutePath());
 		}
+	}
+	
+	private void montaTela(){
+		janela = new JFrame("Huffman");
+		janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		for(char c: teste.toCharArray()){
-			saida.append(mapa.get("" + c));
-		}
+		painelPrincipal = new JPanel();
+		janela.add(painelPrincipal);
 		
-		System.out.println("\n\nOriginal: " + original.length() + " bits - " + original);
-		System.out.println("Compactada: " + saida.length() + " bits - " + saida);
+		JButton escolherArquivo = new JButton("Escolher arquivo...");
+		escolherArquivo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				escolherArquivo();
+			}
+		});
 		
-		Util.gravaArquivo(saida.toString(), "saida.txt");
+		painelPrincipal.add(escolherArquivo);
+		caminhoArquivo = new JTextField(30);
+		painelPrincipal.add(caminhoArquivo);
+		
+		JButton botaoExecutar = new JButton("Executar");
+		botaoExecutar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Huffman.executar(caminhoArquivo.getText());
+				} catch (UnsupportedEncodingException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		painelPrincipal.add(botaoExecutar);
+	
+		janela.pack();
+		janela.setSize(500, 100);
+		janela.setVisible(true);
+		janela.setResizable(false);
 	}
 }
