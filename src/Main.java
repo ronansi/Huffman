@@ -1,18 +1,37 @@
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+
 
 
 public class Main {
-	public static void main(String[] args){
-		String teste = "this is an example for huffman encoding";
+	public static void main(String[] args) throws UnsupportedEncodingException{
+		String teste = "'q";
 		
-		int[] qtd = new int[256];
+		Node raiz = Huffman.montarArvore(teste);
 		
-		for(char c : teste.toCharArray()){
-			qtd[c]++;
+		System.out.println("\n\n¡rvore Huffman");
+		Node.buildHuffmanCode(raiz);
+		Huffman.imprimirArvore(raiz);
+		
+		System.out.println("\n\nChar\tFreq\tCode");
+		Huffman.imprimirTabela(raiz);
+		
+		Map<String, String> mapa = Huffman.getMapHuffmanCodes(raiz);
+		
+		String original = "";
+		StringBuilder saida = new StringBuilder();
+
+		for(byte b: teste.getBytes("UTF-8")){
+			original += Integer.toBinaryString(b);
 		}
 		
-		ArvoreHuffman arvore = Huffman.montarArvore(qtd);
-		System.out.println("SYMBOL\tWEIGHT\tHUFFMAN CODE");
-		Huffman.imprimir(arvore);
+		for(char c: teste.toCharArray()){
+			saida.append(mapa.get("" + c));
+		}
 		
+		System.out.println("\n\nOriginal: " + original.length() + " bits - " + original);
+		System.out.println("Compactada: " + saida.length() + " bits - " + saida);
+		
+		Util.gravaArquivo(saida.toString(), "saida.txt");
 	}
 }
