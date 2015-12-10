@@ -25,7 +25,7 @@ public class Huffman {
 		}
 	}
 
-	public static Node montarArvore(String str){
+	public static Node montarArvore(String str, StringBuilder out){
 		List<Node> nodeList = new ArrayList<Node>();
 		for(char c: str.toCharArray()){
 			boolean contem = false;
@@ -46,8 +46,9 @@ public class Huffman {
 		
 		Collections.sort(nodeList);
 		
-		System.out.println("Vetor de frequencias: ");
-		System.out.println(nodeList);
+		out.append("Vetor de frequencias:\n");
+		out.append(nodeList);
+		out.append("\n\n");
 		
 		while(nodeList.size() > 1){
 			Node esquerda = nodeList.get(0);
@@ -58,8 +59,9 @@ public class Huffman {
 			Node novaRaiz = new Node(direita, esquerda);
 			
 			Node.buildHuffmanCode(novaRaiz);
-			System.out.println("\nSubárvore:");
-			imprimirArvore(novaRaiz);
+			out.append("Subárvore: \n");
+			imprimirArvore(novaRaiz, out);
+			out.append("---------------------------------------------------------------------------------------------\n");
 			
 			nodeList.add(novaRaiz);
 			Collections.sort(nodeList);
@@ -68,48 +70,48 @@ public class Huffman {
 		return nodeList.get(0);
 	}
 	
-	public static void imprimirTabela(Node node){
+	public static void imprimirTabela(Node node, StringBuilder out){
 		if(node.direita != null || node.esquerda != null){
-			imprimirTabela(node.direita);
-			imprimirTabela(node.esquerda);
+			imprimirTabela(node.direita, out);
+			imprimirTabela(node.esquerda, out);
 		}else{
-			System.out.println(node.valor + "\t" + node.qtd + "\t" + node.huffmanCode);
+			out.append("\n" + node.valor + "\t" + node.qtd + "\t" + node.huffmanCode);
 		}
 	}
 	
-	public static void imprimirArvore(Node raiz){
-		imprimirArvore(raiz, 0);
+	public static void imprimirArvore(Node raiz, StringBuilder out){
+		imprimirArvore(raiz, 0, out);
 	}
 	
-	private static void imprimirArvore(Node node, int nivel){
+	private static void imprimirArvore(Node node, int nivel, StringBuilder out){
 		
 		if(node.direita != null)
-			imprimirArvore(node.direita, nivel + 1);
+			imprimirArvore(node.direita, nivel + 1, out);
 		
 		for(int i = 0; i < nivel; i++){
-			System.out.print("\t");
+			out.append("\t");
 		}
-		System.out.print(node.qtd);
+		out.append(node.qtd);
 		if(node.huffmanCode != null){
-			System.out.print(" " + node.valor + " " + node.huffmanCode);
+			out.append(" " + node.valor + " " + node.huffmanCode);
 		}
-		System.out.println();
+		out.append("\n");
 		
 		if(node.esquerda != null)
-			imprimirArvore(node.esquerda, nivel + 1);
+			imprimirArvore(node.esquerda, nivel + 1, out);
 	}
 	
-	public static void executar(String caminhoArquivo) throws UnsupportedEncodingException{
+	public static void executar(String caminhoArquivo, StringBuilder out) throws UnsupportedEncodingException{
 		String teste = Util.lerArquivo(caminhoArquivo);
 		
-		Node raiz = Huffman.montarArvore(teste);
+		Node raiz = Huffman.montarArvore(teste, out);
 		
-		System.out.println("\n\nÁrvore Huffman");
+		out.append("Árvore Huffman\n");
 		Node.buildHuffmanCode(raiz);
-		Huffman.imprimirArvore(raiz);
-		
-		System.out.println("\n\nChar\tFreq\tCode");
-		Huffman.imprimirTabela(raiz);
+		Huffman.imprimirArvore(raiz, out);
+		out.append("\n---------------------------------------------------------------------------------------------\n");
+		out.append("Char\tFreq\tCode");
+		Huffman.imprimirTabela(raiz, out);
 		
 		Map<String, String> mapa = Huffman.getMapHuffmanCodes(raiz);
 		
@@ -124,8 +126,8 @@ public class Huffman {
 			saida.append(mapa.get("" + c));
 		}
 		
-		System.out.println("\n\nOriginal: " + original.length() + " bits");
-		System.out.println("Compactada: " + saida.length() + " bits");
+		out.append("\n\nOriginal: " + original.length() + " bits");
+		out.append("\nCompactada: " + saida.length() + " bits");
 		
 		Util.gravaArquivo(saida.toString(), "saida.txt");
 	}
